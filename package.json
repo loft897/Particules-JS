@@ -1,0 +1,27 @@
+{
+  "name": "authentification",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "webpack": "webpack",
+    "start": "webpack server",
+    "sass": "sass -w scss:css"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "firebase": "^8.2.3",
+    "sass": "^1.49.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/loft897/Particules-JS.git"
+  },
+  "bugs": {
+    "url": "https://github.com/loft897/Particules-JS/issues"
+  },
+  "homepage": "https://github.com/loft897/Particules-JS#readme",
+  "description": ""
+}
