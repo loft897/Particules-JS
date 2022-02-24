@@ -1,93 +1,81 @@
-// const { info } = require("sass");
-const info = document.querySelector('.info');
-const textH1 = document.querySelector('.container h1');
+const canvas = document.getElementById('canvas1');
+const ctx = canvas.getContext('2d');
+ctx.canvas.width = window.innerWidth;
+ctx.canvas.height = window.innerHeight;
+let particuleTab;
+const randomColor = `#${Math.floor(Math.random()*16777215).toString(16)}`;
 
-const btnInscription = document.querySelector('.inscription');
-const btnConnexion = document.querySelector('.connexion');
-const btnDeco = document.querySelector('.deconnexion');
-
-const formInscription = document.querySelector('.form-inscription');
-const emailInscription = document.querySelector('.email-inscription');
-const passWInscription = document.querySelector('.pw-inscription');
-
-const formConnexion = document.querySelector('.form-connexion');
-const emailConnexion = document.querySelector('.email-connexion');
-const passWConnexion = document.querySelector('.pw-connexion');
-
-
-btnInscription.addEventListener('click', (e) => {
-    e.preventDefault()
-
-    if(formConnexion.classList.contains('apparition')){
-        formConnexion.classList.remove('apparition');
+class Particule{
+    constructor(x, y, directionX, directionY, taille, couleur){
+        this.x = x;
+        this.y = y;
+        this.directionX = directionX;
+        this.directionY = directionY;
+        this.taille = taille;
+        this.couleur = couleur;
     }
 
-    formInscription.classList.toggle('apparition');
-}) 
-
-
-btnConnexion.addEventListener('click', (e) => {
-    e.preventDefault()
-
-    if(formInscription.classList.contains('apparition')){
-        formInscription.classList.remove('apparition');
+    dessine(){
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.taille, 0, Math.PI*2, false);
+        ctx.fillStyle = this.couleur;
+        ctx.fill();
     }
 
-    formConnexion.classList.toggle('apparition');
-}) 
+    MAJ(){
+        if(this.x + this.taille > canvas.width || this.x - this.taille < 0){
+            this.directionX = -this.directionX;
+        }
+        if(this.y + this.taille > canvas.height || this.y - this.taille < 0){
+            this.directionY = - this.directionY;
+        }
+        this.x += this.directionX;
+        this.y += this.directionY;
+        this.dessine();
+    }
+}
 
-// INSCRIPTION
+// const obj1 = new Particule(300,300,1,1,100, randomColor);
+// console.log(obj1);
+// obj1.dessine();
 
-formInscription.addEventListener('submit', (e) => {
-    e.preventDefault();
+function init(){
+    particuleTab = [];
+    for(let i = 0; i < 100; i++){
+        let taille = (Math.random() + 0.01) * 20;
+        let x = Math.random() * (window.innerWidth - taille* 2);
+        let y = Math.random() * (window.innerHeight - taille* 2);
+        let directionX = (Math.random() * 4) - 2;
+        let directionY = (Math.random() * 4) - 2;
 
-    const mailInscrValeur = emailInscription.value;
-    const pwInscrValeur = passWInscription.value;
-
-    auth.createUserWithEmailAndPassword(mailInscrValeur, pwInscrValeur)
-    .then(cred => {
-        console.log(cred);
-        formInscription.reset();
-        formInscription.classList.toggle('apparition');
-    });
-});
-
-// DECONNEXION
-
-btnDeco.addEventListener('click', (e) => {
-    e.preventDefault();
-
-    auth.signOut().then(() => {
-        console.log('Deconnecté')
-    });
-});
-
-// CONNEXION
-
-formConnexion.addEventListener('submit', (e) => {
-    e.preventDefault();
-
-    const mailConValeur = emailConnexion.value;
-    const pwConValeur = passWConnexion.value;
-
-    auth.signInWithEmailAndPassword(mailConValeur, pwConValeur)
-    .then(cred => {
-        console.log('Connecté', cred.user);
-        formConnexion.reset();
-        formConnexion.classList.toggle('apparition');
-    });
-});
+        particuleTab.push(new Particule(x,y,directionX,directionY,taille, randomColor));
+    }
+}
 
 
-// Gerer le contenu
+function animation(){
+    requestAnimationFrame(animation);
+    ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
+    
+    for(let i = 0; i < particuleTab.length; i++){
+        particuleTab[i].MAJ();
+    }
+}
 
-auth.onAuthStateChanged(utilisateur => {
-    if(utilisateur){
-        info.innerText = "Voici le contenu privé"
-        textH1.innerText = "Vous voilà de retour! :)"
-    } else {
-        console.log("Utilisateur s'est déconnecté(e)");
-        info.innerText = "Contenu public.";
-        textH1.innerText = "Bienvenue sur notre plateforme, inscrivez-vous ou connectez-vous!"
-    };
-});
+
+init();
+animation();
+
+
+function resize(){
+    init();
+    animation();
+}
+
+let doIt;
+window.addEventListener('resize', () => {
+    clearTimeout(doIt);
+    doIt = setTimeout(resize, 100);
+    ctx.canvas.width = window.innerWidth;
+    ctx.canvas.height = window.innerHeight;
+})
